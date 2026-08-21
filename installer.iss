@@ -1,5 +1,5 @@
 #define MyAppName "YT Video Developer"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "Ghayathri Malcolm"
 #define MyAppExeName "YTVideoDeveloper.exe"
 

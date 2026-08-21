@@ -114,7 +114,7 @@ STYLE_ANCHOR = (
     "composition. Naive sketchbook aesthetic, playful and whimsical character "
     "design, clean white background, minimal linework, expressive simplicity, "
     "handmade doodle style, water color ink drawing, charming imperfections, "
-    "simple cartoon illustration."
+    "simple cartoon illustration. Do not mention the timestamp on the image."
 )
 
 STYLE_LOCK = (
@@ -124,7 +124,7 @@ STYLE_LOCK = (
 
 
 def format_image_prompt(timestamp: str, scene: str) -> str:
-    return f"[{timestamp}] {STYLE_ANCHOR}{scene}, {STYLE_LOCK}"
+    return f"[{timestamp}] {STYLE_ANCHOR} {scene}, {STYLE_LOCK}"
 
 
 # Long scripts can produce 100-250+ timestamp lines. Asking Claude for every scene
