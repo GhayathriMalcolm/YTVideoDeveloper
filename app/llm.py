@@ -96,9 +96,13 @@ the previous one and describe only what changed.
 - Where appropriate use one of these proven frame types: a concept text frame \
 (large central object like an hourglass/clock/skull plus bold ALL CAPS text at top), \
 a labeled diagram (object plus a yellow diagonal arrow plus an ALL CAPS label word), \
-a figure reaction (thought bubble above the head containing "?", "HMMMM", "!", or \
-"WAIT..."), or a villain personified (an abstract concept given an angry cartoon face, \
+a figure reaction (thought bubble above the head containing '?', 'HMMMM', '!', or \
+'WAIT...'), or a villain personified (an abstract concept given an angry cartoon face, \
 e.g. a sun with a knife, a brain with boxing gloves).
+- Critical JSON formatting rule: never use a double-quote character (") anywhere \
+inside a "scene" value, including for on-screen text, labels, or thought-bubble \
+words. Use single quotes (e.g. 'WAIT...') instead, since a raw double-quote inside \
+the string breaks JSON parsing.
 
 Respond with ONLY a single JSON array, no commentary, no markdown fences, in exactly \
 this shape:
