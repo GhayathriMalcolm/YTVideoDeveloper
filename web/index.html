@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>YT Video Developer</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<aside id="sidebar">
+  <h1>YT Video Developer</h1>
+  <button id="new-project-btn">+ New Project</button>
+  <ul id="project-list"></ul>
+</aside>
+
+<main>
+  <div id="update-banner" class="notice hidden"></div>
+  <div id="empty-state" class="notice">Create a new project to get started, or pick one from the sidebar.</div>
+
+  <div id="workspace" class="hidden">
+    <h2 id="video-title" class="hidden"></h2>
+
+    <section id="step-topic" class="step">
+      <h2>1. Topic</h2>
+      <input type="text" id="topic-input" placeholder="e.g. Why you fear the dark" />
+      <div>
+        <button id="generate-script-btn">Generate Script</button>
+      </div>
+      <div id="topic-error" class="notice error hidden"></div>
+    </section>
+
+    <section id="step-script" class="step">
+      <h2>2. Script</h2>
+      <textarea id="script-preview" readonly></textarea>
+      <div>
+        <button id="download-script-btn" class="secondary">Download script file</button>
+      </div>
+      <div class="notice">Download the script file above, then paste its text into your voiceover tool of choice to generate your narration audio. Come back here and upload the resulting MP3 below.</div>
+    </section>
+
+    <section id="step-audio" class="step">
+      <h2>3. Upload Narration Audio</h2>
+      <input type="file" id="audio-input" accept="audio/*" />
+      <div>
+        <button id="transcribe-btn">Transcribe Audio</button>
+      </div>
+      <div id="audio-status" class="notice hidden"></div>
+    </section>
+
+    <section id="step-transcript" class="step">
+      <h2>4. Timestamped Transcript</h2>
+      <textarea id="transcript-preview" readonly></textarea>
+      <div>
+        <button id="download-transcript-btn" class="secondary">Download transcript</button>
+        <button id="generate-prompts-btn">Generate Image Prompts</button>
+      </div>
+    </section>
+
+    <section id="step-prompts" class="step">
+      <h2>5. Image Prompts</h2>
+      <textarea id="prompts-preview" readonly></textarea>
+      <div>
+        <button id="download-prompts-btn" class="secondary">Download prompts file</button>
+      </div>
+      <div class="notice">Download the prompts file above, then open Google Flow and generate one image per prompt, in order. Come back here and upload all the generated images below.</div>
+    </section>
+
+    <section id="step-images" class="step">
+      <h2>6. Upload Generated Images</h2>
+      <input type="file" id="images-input" accept="image/*" multiple />
+      <div>
+        <button id="upload-images-btn">Upload Images</button>
+      </div>
+      <div id="images-status" class="notice hidden"></div>
+      <div id="image-grid" class="image-grid"></div>
+      <div>
+        <button id="assemble-btn">Assemble Video</button>
+      </div>
+      <div id="assemble-status" class="notice hidden"></div>
+    </section>
+
+    <section id="step-video" class="step">
+      <h2>7. Final Video</h2>
+      <video id="video-player" controls></video>
+      <div>
+        <button id="download-video-btn" class="secondary">Download video</button>
+        <button id="generate-metadata-btn">Generate Titles, Description &amp; Tags</button>
+      </div>
+    </section>
+
+    <section id="step-metadata" class="step">
+      <h2>8. Titles, Description &amp; Tags</h2>
+      <div id="titles-list"></div>
+      <h3>Description</h3>
+      <textarea id="description-preview" readonly></textarea>
+      <button id="copy-description-btn" class="secondary">Copy description</button>
+      <h3>Tags</h3>
+      <div id="tags-list" class="tag-list"></div>
+      <button id="copy-tags-btn" class="secondary">Copy tags</button>
+    </section>
+  </div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
