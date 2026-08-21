@@ -12,6 +12,14 @@ _model: WhisperModel | None = None
 
 SENTENCE_END_RE = re.compile(r'[.!?]["\')\]]*\s*$')
 
+# Each timestamped line becomes one image prompt/upload downstream, so a script
+# with many short sentences can otherwise produce 100+ of them. If the raw
+# per-sentence count would exceed this, consecutive sentences are merged
+# (only at sentence boundaries, so no mid-thought cuts) until each line spans
+# at least MIN_LINE_SECONDS, keeping the total comfortably under 100.
+TARGET_MAX_LINES = 90
+MIN_LINE_SECONDS = 4.0
+
 
 def _get_model() -> WhisperModel:
     global _model
@@ -75,9 +83,10 @@ def transcribe(audio_path: Path) -> List[Dict[str, str]]:
             else:
                 words.append(type("W", (), {"start": segment.start, "word": segment.text})())
 
-    lines: List[Dict[str, str]] = []
+    sentences: List[Dict] = []
     current_words: List[str] = []
     current_start = None
+    current_end = None
 
     for w in words:
         token = w.word.strip()
@@ -86,17 +95,18 @@ def transcribe(audio_path: Path) -> List[Dict[str, str]]:
         if current_start is None:
             current_start = w.start
         current_words.append(token)
+        current_end = getattr(w, "end", w.start)
         if SENTENCE_END_RE.search(token):
             text = " ".join(current_words).strip()
             text = re.sub(r"\s+([.,!?;:])", r"\1", text)
-            lines.append({"timestamp": _format_timestamp(current_start), "text": text})
+            sentences.append({"start": current_start, "end": current_end, "text": text})
             current_words = []
             current_start = None
 
     if current_words:
         text = " ".join(current_words).strip()
         text = re.sub(r"\s+([.,!?;:])", r"\1", text)
-        lines.append({"timestamp": _format_timestamp(current_start or 0.0), "text": text})
+        sentences.append({"start": current_start or 0.0, "end": current_end or 0.0, "text": text})
 
     last_word_end = words[-1].end if words and hasattr(words[-1], "end") else 0.0
     if info.duration > 30 and last_word_end < info.duration * 0.9:
@@ -105,6 +115,30 @@ def transcribe(audio_path: Path) -> List[Dict[str, str]]:
             f"audio is {_format_timestamp(info.duration)} long. This usually means Whisper "
             "hit a hallucination loop partway through - try re-uploading the audio."
         )
+
+    return _merge_into_line_budget(sentences)
+
+
+def _merge_into_line_budget(sentences: List[Dict]) -> List[Dict[str, str]]:
+    if len(sentences) <= TARGET_MAX_LINES or not sentences:
+        return [{"timestamp": _format_timestamp(s["start"]), "text": s["text"]} for s in sentences]
+
+    total_duration = sentences[-1]["end"] - sentences[0]["start"]
+    min_gap = max(MIN_LINE_SECONDS, total_duration / TARGET_MAX_LINES)
+
+    lines: List[Dict[str, str]] = []
+    bucket_start = None
+    bucket_texts: List[str] = []
+    for s in sentences:
+        if bucket_start is None:
+            bucket_start = s["start"]
+        bucket_texts.append(s["text"])
+        if s["end"] - bucket_start >= min_gap:
+            lines.append({"timestamp": _format_timestamp(bucket_start), "text": " ".join(bucket_texts)})
+            bucket_start = None
+            bucket_texts = []
+    if bucket_texts:
+        lines.append({"timestamp": _format_timestamp(bucket_start), "text": " ".join(bucket_texts)})
 
     return lines
 
